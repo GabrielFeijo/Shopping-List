@@ -1,3 +1,4 @@
+import { measureTypes } from '@/utils/measureTypes';
 import { Input } from '../ui/input';
 import {
 	Select,
@@ -23,14 +24,19 @@ const DropdownUnit = () => {
 					type='number'
 					placeholder='Qtde.'
 				/>
-				<Select name='unit'>
+				<Select name='measureType'>
 					<SelectTrigger className='w-20 rounded-none rounded-r-lg text-xs'>
 						<SelectValue placeholder='Unit' />
 					</SelectTrigger>
-					<SelectContent className='!w-20'>
-						<SelectItem value='und'>UN.</SelectItem>
-						<SelectItem value='l'>L</SelectItem>
-						<SelectItem value='kg'>Kg</SelectItem>
+					<SelectContent>
+						{measureTypes.map((measureType) => (
+							<SelectItem
+								key={measureType.id}
+								value={measureType.value}
+							>
+								{measureType.name}
+							</SelectItem>
+						))}
 					</SelectContent>
 				</Select>
 			</div>

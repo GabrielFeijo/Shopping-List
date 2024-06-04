@@ -1,68 +1,86 @@
 'use client';
 import { useOptimistic } from 'react';
-import { Input } from '../ui/input';
 import DropdownCategory from './dropdown-category';
 import DropdownUnit from './dropdown-unit';
 import InputComponent from './input';
 import { Plus } from 'lucide-react';
+import { z } from 'zod';
+import { ItemType } from '@/app/page';
+import { Category, MeasureType } from '@prisma/client';
 
-type JobType = {
-	sand_id?: number;
-	name: string;
-	job: string;
-};
-type JobProps = {
-	jobs: JobType[];
+type ItemProps = {
+	items: ItemType[];
 	validateData: any;
 };
 
-export default function Form({ jobs, validateData }: JobProps) {
-	const [optimisticJob, addOptimisticJob] = useOptimistic(
-		jobs,
-		(state, newJob: JobType) => {
-			return [...state, newJob];
+const newItemSchema = z.object({
+	name: z.string().min(2, { message: 'Nome é obrigatório' }),
+	quantity: z
+		.string()
+		.min(1, { message: 'Quantidade é obrigatória' })
+		.transform((str) => Number(str)),
+	measureType: z.nativeEnum(MeasureType),
+	category: z.nativeEnum(Category),
+});
+
+export default function Form({ items, validateData }: ItemProps) {
+	const [optimisticItem, addOptimisticItem] = useOptimistic(
+		items,
+		(state, newItem: ItemType) => {
+			return [...state, newItem];
 		}
 	);
 
-	const addJob = async (e: FormData) => {
-		const name = e.get('name')?.toString();
-		const job = e.get('job')?.toString();
-		if (!name || !job) return;
+	const registerItem = async (e: FormData) => {
+		const result = newItemSchema.safeParse(Object.fromEntries(e));
 
-		const formInput = {
-			name,
-			job,
-		};
+		if (!result.success) {
+			return result.error.flatten().fieldErrors;
+		}
 
-		addOptimisticJob(formInput);
+		addOptimisticItem(result.data);
 
-		await fetch('https://api.sandapi.com/user_wFnZRo/jobs', {
+		await fetch('http://localhost:3000/api/items', {
 			method: 'POST',
-			body: JSON.stringify(formInput),
+			body: JSON.stringify(result.data),
 			headers: {
 				'Content-Type': 'application/json',
 			},
 		});
+
 		await validateData();
 	};
 
 	return (
-		<main className='space-y-6 w-3/4 mx-auto'>
+		<section className='space-y-6 w-3/4 mx-auto mt-20  relative'>
 			<h1 className='font-bold text-2xl'>Lista de Compras</h1>
 			<form
-				action={addJob}
+				action={registerItem}
 				className='flex flex-1 gap-3 items-center'
 			>
 				<InputComponent />
 				<DropdownUnit />
 				<DropdownCategory />
-				<button
-					type='submit'
-					className='bg-[#7450AC] rounded-full p-2'
-				>
-					<Plus />
-				</button>
+
+				<div className='h-4'>
+					<button
+						type='submit'
+						className='bg-[#7450AC] rounded-full p-2'
+					>
+						<Plus />
+					</button>
+				</div>
 			</form>
-		</main>
+			{optimisticItem.map((item) => (
+				<div
+					key={item.name}
+					className='flex items-center justify-between'
+				>
+					<div className='flex items-center gap-2'>
+						{item.quantity} {item.measureType} de {item.name}
+					</div>
+				</div>
+			))}
+		</section>
 	);
 }

@@ -41,7 +41,7 @@ export default function Form({ items, validateData }: ItemProps) {
 
 		addOptimisticItem(result.data);
 
-		await fetch('http://localhost:3000/api/items', {
+		await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/items`, {
 			method: 'POST',
 			body: JSON.stringify(result.data),
 			headers: {

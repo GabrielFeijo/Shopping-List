@@ -26,7 +26,7 @@ export default async function Home() {
 	};
 	return (
 		<main>
-			<div className='bg-[url("/background.png")] bg-contain h-44 fixed top-0 left-0 w-full bg-center' />
+			<div className='bg-[url("/background.png")] md:bg-contain h-44 fixed top-0 left-0 w-full md:bg-center' />
 			<Form
 				items={data}
 				validateData={validateData}

@@ -53,11 +53,11 @@ export default function Form({ items, validateData }: ItemProps) {
 	};
 
 	return (
-		<section className='space-y-6 w-3/4 mx-auto mt-20  relative'>
+		<section className='space-y-6 w-3/4 mx-auto mt-20 relative'>
 			<h1 className='font-bold text-2xl'>Lista de Compras</h1>
 			<form
 				action={registerItem}
-				className='flex flex-1 gap-3 items-center'
+				className='flex flex-1 gap-3 items-center sm:flex-nowrap flex-wrap'
 			>
 				<InputComponent />
 				<DropdownUnit />
@@ -72,12 +72,14 @@ export default function Form({ items, validateData }: ItemProps) {
 					</button>
 				</div>
 			</form>
-			{optimisticItem.map((item) => (
-				<ItemChecklist
-					key={item.name}
-					{...item}
-				></ItemChecklist>
-			))}
+			<div className='h-[calc(100vh-15rem)] space-y-6 overflow-auto pr-1.5'>
+				{optimisticItem.map((item) => (
+					<ItemChecklist
+						key={item.name}
+						{...item}
+					></ItemChecklist>
+				))}
+			</div>
 		</section>
 	);
 }

@@ -9,7 +9,7 @@ import {
 
 const DropdownCategory = () => {
 	return (
-		<div className='w-full'>
+		<div className='sm:w-full'>
 			<label
 				htmlFor='category'
 				className='text-xs tracking-wide '

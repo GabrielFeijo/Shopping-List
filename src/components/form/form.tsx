@@ -7,6 +7,7 @@ import { Plus } from 'lucide-react';
 import { z } from 'zod';
 import { ItemType } from '@/app/page';
 import { Category, MeasureType } from '@prisma/client';
+import ItemChecklist from '../item-checklist';
 
 type ItemProps = {
 	items: ItemType[];
@@ -72,14 +73,10 @@ export default function Form({ items, validateData }: ItemProps) {
 				</div>
 			</form>
 			{optimisticItem.map((item) => (
-				<div
+				<ItemChecklist
 					key={item.name}
-					className='flex items-center justify-between'
-				>
-					<div className='flex items-center gap-2'>
-						{item.quantity} {item.measureType} de {item.name}
-					</div>
-				</div>
+					{...item}
+				></ItemChecklist>
 			))}
 		</section>
 	);

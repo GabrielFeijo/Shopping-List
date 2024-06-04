@@ -25,7 +25,7 @@ const DropdownCategory = () => {
 						{categories.map((category) => (
 							<SelectItem
 								key={category.id}
-								value={category.value}
+								value={category.name.toUpperCase()}
 							>
 								<div className='flex items-center gap-2'>
 									{category.icon} {category.name}

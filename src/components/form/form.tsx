@@ -47,6 +47,7 @@ export default function Form({ items, validateData }: ItemProps) {
 			headers: {
 				'Content-Type': 'application/json',
 			},
+			cache: 'no-store',
 		});
 
 		await validateData();

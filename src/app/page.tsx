@@ -13,7 +13,7 @@ export type ItemType = {
 export default async function Home() {
 	('use server');
 	const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/items`, {
-		cache: 'no-cache',
+		cache: 'no-store',
 		next: {
 			tags: ['item'],
 		},

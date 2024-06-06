@@ -32,7 +32,7 @@ $ git clone https://github.com/GabrielFeijo/Shopping-List
 $ cd Shopping-List
 
 # Instale as dependências
-npm install
+npm install --force ou --legacy-peer-deps
 
 # Configure as variáveis de ambiente no arquivo .env
 DATABASE_URL="string"

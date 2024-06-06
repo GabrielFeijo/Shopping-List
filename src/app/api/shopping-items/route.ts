@@ -1,9 +1,9 @@
 import { db } from '@/lib/prisma';
-import { Items } from '@prisma/client';
+import { ShoppingItem } from '@prisma/client';
 import { NextResponse, NextRequest } from 'next/server';
 
 export async function GET() {
-	const items: Items[] = await db.items.findMany();
+	const items: ShoppingItem[] = await db.shoppingItem.findMany();
 
 	return new NextResponse(JSON.stringify(items), {
 		status: 200,
@@ -12,9 +12,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-	const data: Items = await request.json();
+	const data: ShoppingItem = await request.json();
 
-	const createdArticle: Items = await db.items.create({
+	const createdArticle: ShoppingItem = await db.shoppingItem.create({
 		data,
 	});
 

@@ -13,7 +13,7 @@ const InputComponent = () => {
 				<Input
 					className='focus-visible:ring-transparent'
 					placeholder='Nome do item'
-					name='name'
+					name='itemName'
 				/>
 			</div>
 		</div>

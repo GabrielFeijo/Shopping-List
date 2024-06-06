@@ -1,34 +1,39 @@
 import Form from '@/components/form/form';
-import { Category, MeasureType } from '@prisma/client';
+import { ItemCategory, UnitOfMeasure } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import React from 'react';
 
-export type ItemType = {
-	name: string;
+export type ShoppingItemType = {
+	itemName: string;
 	quantity: number;
-	measureType: MeasureType;
-	category: Category;
+	unitOfMeasure: UnitOfMeasure;
+	category: ItemCategory;
+	completed: boolean;
 };
 
 export default async function Home() {
 	('use server');
-	const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/items`, {
-		cache: 'no-store',
-		next: {
-			tags: ['item'],
-		},
-	});
-	const data: ItemType[] = await res.json();
+	const res = await fetch(
+		`${process.env.NEXT_PUBLIC_BASE_URL}/shopping-items`,
+		{
+			cache: 'no-store',
+			next: {
+				tags: ['shopping-items'],
+			},
+		}
+	);
+
+	const data: ShoppingItemType[] = await res.json();
 
 	const validateData = async () => {
 		'use server';
-		revalidatePath('/items');
+		revalidatePath('/shopping-items');
 	};
 	return (
 		<main>
 			<div className='bg-[url("/background.png")] md:bg-contain h-44 fixed top-0 left-0 w-full md:bg-center' />
 			<Form
-				items={data}
+				shoppingItems={data}
 				validateData={validateData}
 			/>
 		</main>

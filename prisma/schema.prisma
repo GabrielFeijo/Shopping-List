@@ -13,15 +13,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Items {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  quantity    Int         @default(1)
-  measureType MeasureType
-  category    Category
+model ShoppingItem {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  itemName      String
+  quantity      Int           @default(1)
+  unitOfMeasure UnitOfMeasure
+  category      ItemCategory
+  completed     Boolean       @default(false)
 }
 
-enum Category {
+enum ItemCategory {
   PADARIA
   LEGUME
   CARNE
@@ -29,7 +30,7 @@ enum Category {
   BEBIDA
 }
 
-enum MeasureType {
+enum UnitOfMeasure {
   UNIT
   LITER
   KILOGRAM

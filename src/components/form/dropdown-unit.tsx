@@ -24,7 +24,7 @@ const DropdownUnit = () => {
 					type='number'
 					placeholder='Qtde.'
 				/>
-				<Select name='measureType'>
+				<Select name='unitOfMeasure'>
 					<SelectTrigger className='w-20 rounded-none rounded-r-lg text-xs'>
 						<SelectValue placeholder='Unit' />
 					</SelectTrigger>

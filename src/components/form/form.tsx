@@ -5,30 +5,33 @@ import DropdownUnit from './dropdown-unit';
 import InputComponent from './input';
 import { Plus } from 'lucide-react';
 import { z } from 'zod';
-import { ItemType } from '@/app/page';
-import { Category, MeasureType } from '@prisma/client';
 import ItemChecklist from '../item-checklist';
+import { ShoppingItemType } from '@/app/page';
+import { ItemCategory, UnitOfMeasure } from '@prisma/client';
 
-type ItemProps = {
-	items: ItemType[];
+type ShoppingListProps = {
+	shoppingItems: ShoppingItemType[];
 	validateData: any;
 };
 
 const newItemSchema = z.object({
-	name: z.string().min(2, { message: 'Nome é obrigatório' }),
+	itemName: z.string().min(2, { message: 'Nome é obrigatório' }),
 	quantity: z
 		.string()
 		.min(1, { message: 'Quantidade é obrigatória' })
 		.transform((str) => Number(str)),
-	measureType: z.nativeEnum(MeasureType),
-	category: z.nativeEnum(Category),
+	unitOfMeasure: z.nativeEnum(UnitOfMeasure),
+	category: z.nativeEnum(ItemCategory),
 });
 
-export default function Form({ items, validateData }: ItemProps) {
+export default function Form({
+	shoppingItems,
+	validateData,
+}: ShoppingListProps) {
 	const [optimisticItem, addOptimisticItem] = useOptimistic(
-		items,
-		(state, newItem: ItemType) => {
-			return [...state, newItem];
+		shoppingItems,
+		(state, newShoppingItem: ShoppingItemType) => {
+			return [...state, newShoppingItem];
 		}
 	);
 
@@ -39,15 +42,14 @@ export default function Form({ items, validateData }: ItemProps) {
 			return result.error.flatten().fieldErrors;
 		}
 
-		addOptimisticItem(result.data);
+		addOptimisticItem({ ...result.data, completed: false });
 
-		await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/items`, {
+		await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/shopping-items`, {
 			method: 'POST',
 			body: JSON.stringify(result.data),
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			cache: 'no-store',
 		});
 
 		await validateData();
@@ -74,10 +76,10 @@ export default function Form({ items, validateData }: ItemProps) {
 				</div>
 			</form>
 			<div className='h-[calc(100vh-15rem)] space-y-6 overflow-auto pr-1.5'>
-				{optimisticItem.map((item) => (
+				{optimisticItem.map((shoppingItem) => (
 					<ItemChecklist
-						key={item.name}
-						{...item}
+						key={shoppingItem.itemName}
+						{...shoppingItem}
 					></ItemChecklist>
 				))}
 			</div>

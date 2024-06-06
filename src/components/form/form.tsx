@@ -1,5 +1,5 @@
 'use client';
-import { startTransition, useOptimistic } from 'react';
+import { useOptimistic } from 'react';
 import DropdownCategory from './dropdown-category';
 import DropdownUnit from './dropdown-unit';
 import InputComponent from './input';
@@ -8,10 +8,12 @@ import { z } from 'zod';
 import ItemChecklist from '../item-checklist';
 import { ShoppingItemType } from '@/app/page';
 import { ItemCategory, UnitOfMeasure } from '@prisma/client';
+import { saveItem } from './actions/register-item';
+import { updateItem } from './actions/update-item';
 
 type ShoppingListProps = {
 	shoppingItems: ShoppingItemType[];
-	validateData: any;
+	validateData: () => Promise<void>;
 };
 
 const newItemSchema = z.object({
@@ -71,22 +73,18 @@ export default function Form({
 
 		const id = mongoObjectId();
 
+		const newShoppingItem = {
+			id,
+			...result.data,
+			completed: false,
+		};
+
 		addOptimisticItem({
-			newShoppingItem: {
-				id,
-				...result.data,
-				completed: false,
-			},
+			newShoppingItem,
 			action: 'create',
 		});
 
-		await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/shopping-items`, {
-			method: 'POST',
-			body: JSON.stringify({ ...result.data, id }),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
+		await saveItem(newShoppingItem);
 
 		await validateData();
 	};
@@ -97,13 +95,7 @@ export default function Form({
 			action: 'update',
 		});
 
-		await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/shopping-items`, {
-			method: 'PUT',
-			body: JSON.stringify(item),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
+		await updateItem(item);
 
 		await validateData();
 	};

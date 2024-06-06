@@ -1,5 +1,5 @@
 'use client';
-import { useOptimistic } from 'react';
+import { startTransition, useOptimistic } from 'react';
 import DropdownCategory from './dropdown-category';
 import DropdownUnit from './dropdown-unit';
 import InputComponent from './input';
@@ -30,10 +30,37 @@ export default function Form({
 }: ShoppingListProps) {
 	const [optimisticItem, addOptimisticItem] = useOptimistic(
 		shoppingItems,
-		(state, newShoppingItem: ShoppingItemType) => {
-			return [...state, newShoppingItem];
+		(
+			state,
+			{
+				action,
+				newShoppingItem,
+			}: { action: string; newShoppingItem: ShoppingItemType }
+		) => {
+			switch (action) {
+				case 'delete':
+					return state.filter(({ id }) => id !== newShoppingItem.id);
+				case 'update':
+					return state.map((t) =>
+						t.id === newShoppingItem.id ? newShoppingItem : t
+					);
+				default:
+					return [...state, newShoppingItem];
+			}
 		}
 	);
+
+	const mongoObjectId = () => {
+		const timestamp = ((new Date().getTime() / 1000) | 0).toString(16);
+		return (
+			timestamp +
+			'xxxxxxxxxxxxxxxx'
+				.replace(/[x]/g, function () {
+					return ((Math.random() * 16) | 0).toString(16);
+				})
+				.toLowerCase()
+		);
+	};
 
 	const registerItem = async (e: FormData) => {
 		const result = newItemSchema.safeParse(Object.fromEntries(e));
@@ -42,11 +69,37 @@ export default function Form({
 			return result.error.flatten().fieldErrors;
 		}
 
-		addOptimisticItem({ ...result.data, completed: false });
+		const id = mongoObjectId();
+
+		addOptimisticItem({
+			newShoppingItem: {
+				id,
+				...result.data,
+				completed: false,
+			},
+			action: 'create',
+		});
 
 		await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/shopping-items`, {
 			method: 'POST',
-			body: JSON.stringify(result.data),
+			body: JSON.stringify({ ...result.data, id }),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+
+		await validateData();
+	};
+
+	const handleClick = async (item: ShoppingItemType) => {
+		addOptimisticItem({
+			newShoppingItem: item,
+			action: 'update',
+		});
+
+		await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/shopping-items`, {
+			method: 'PUT',
+			body: JSON.stringify(item),
 			headers: {
 				'Content-Type': 'application/json',
 			},
@@ -78,7 +131,8 @@ export default function Form({
 			<div className='h-[calc(100vh-15rem)] space-y-6 overflow-auto pr-1.5'>
 				{optimisticItem.map((shoppingItem) => (
 					<ItemChecklist
-						key={shoppingItem.itemName}
+						key={shoppingItem.id}
+						handleClick={handleClick}
 						{...shoppingItem}
 					></ItemChecklist>
 				))}

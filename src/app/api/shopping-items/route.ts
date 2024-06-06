@@ -23,3 +23,20 @@ export async function POST(request: NextRequest) {
 		statusText: 'Created',
 	});
 }
+
+export async function PUT(request: NextRequest) {
+	const data: ShoppingItem = await request.json();
+	const { id, ...rest } = data;
+
+	await db.shoppingItem.update({
+		where: {
+			id,
+		},
+		data: rest,
+	});
+
+	return new NextResponse(JSON.stringify({ id }), {
+		status: 200,
+		statusText: 'OK',
+	});
+}

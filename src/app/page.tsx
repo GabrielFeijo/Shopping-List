@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import React from 'react';
 
 export type ShoppingItemType = {
+	id: string;
 	itemName: string;
 	quantity: number;
 	unitOfMeasure: UnitOfMeasure;
